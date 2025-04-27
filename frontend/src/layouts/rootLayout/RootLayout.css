@@ -20,14 +20,13 @@
     display: flex;
     width: 100%;
     flex-direction: column;
-    border: 1px solid blue;
 }
 
 header {
     width: 100%;
     display: flex;
     align-items: center;
-    /* border: 1px solid red; */
+    background-color: #0a0a0a;
     justify-content: space-between;
 }
 
@@ -36,6 +35,9 @@ header {
     align-items: center;
     font-weight: bold;
     gap: 8px;
+    text-decoration: unset;
+    color: #ffffff;
+    margin: 1em;
 }
 
 img {
@@ -47,11 +49,3 @@ main {
     flex: 1;
     overflow: hidden;
 }
-
-/* 
-
-
-        }
-    }
-
-} */
