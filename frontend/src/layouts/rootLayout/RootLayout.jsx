@@ -1,5 +1,4 @@
 import React from 'react'
-import "./rootLayout.css";
 import { Link, Outlet } from 'react-router-dom'
 import logo from '../../assets/react.svg'
 import { ClerkProvider, SignedIn, SignOutButton } from '@clerk/clerk-react'
@@ -12,13 +11,12 @@ if (!PUBLISHABLE_KEY) {
     throw new Error("Missing Publishable Key")
 }
 
-
 const RootLayout = () => {
     return (<ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
-        <div className="mainLayout" >
-            <header>
-                <Link to='/' className='logo'>
-                    <img src={logo} alt="logo" />
+        <div className="p-0 h-dvh w-full flex flex-col">
+            <header className='w-full flex justify-between items-center bg-[#0a0a0a]'>
+                <Link to='/' className='flex items-center text-white m-[1em] font-bold gap-[8px]'>
+                    <img src={logo} alt="logo" className='w-[32px] h-[32px]' />
                     <span>AI CHAT</span>
                 </Link>
                 <div className="user">
@@ -27,7 +25,7 @@ const RootLayout = () => {
                     </SignedIn>
                 </div>
             </header>
-            <main>
+            <main className='overflow-hidden flex-1'>
                 <Outlet />
             </main>
         </div>

@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './Home.css'
+
 const Home = () => {
     return (
-        <div className='home'>
-            <Link to="/dashboard" className='link'>Dashboard</Link>
+        <div className='flex items-center justify-center h-dvh'>
+            <Link to="/dashboard" className='border-1 p-2 text-[18px] uppercase rounded font-bold'>Dashboard</Link>
         </div>
     )
 }
