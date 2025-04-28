@@ -2,7 +2,7 @@ import './index.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { CHAT, DASHBOARD } from './routes.js';
+import { CHAT_ID, DASHBOARD } from './routes.js';
 import Home from './pages/home/Home.jsx'
 import Dashboard from './pages/dashboard/Dashboard.jsx'
 import Chat from './pages/chat/Chat.jsx';
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
             element: <Dashboard />
           },
           {
-            path: CHAT,
+            path: CHAT_ID,
             element: <Chat />,
           },
         ]
