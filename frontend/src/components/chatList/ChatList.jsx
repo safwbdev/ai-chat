@@ -22,7 +22,7 @@ const ChatList = () => {
             <Break />
             <Title>Recent Chats</Title>
             <div className="flex flex-col overflow-y-scroll">
-                {[1, 2, 3].map((num) => (<Item to={`${CHAT}/${num}`}>Chat {num}</Item>))}
+                {[1, 2, 3].map((num) => (<Item to={`${CHAT}/${num}`} key={num}>Chat {num}</Item>))}
             </div>
             <Break />
             <div className="mt-auto flex items-center gap-[10px] text-[12px]">
