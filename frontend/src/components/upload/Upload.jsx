@@ -1,5 +1,6 @@
 import React, { useRef } from 'react'
 import { IKContext, IKUpload } from 'imagekitio-react';
+import { IoMdImage } from "react-icons/io";
 
 const urlEndpoint = import.meta.env.VITE_IMAGEKIT_ENDPOINT;
 const publicKey = import.meta.env.VITE_PUBLIC_KEY;
@@ -38,8 +39,21 @@ const Upload = ({ setImg }) => {
     };
 
     const onUploadStart = evt => {
-        console.log("Start", evt);
-        setImg(prev => ({ ...prev, isLoading: true }))
+        const file = evt.target.files[0];
+
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            setImg(prev => ({
+                ...prev, isLoading: true, aiData: {
+                    inlineData: {
+                        data: reader.result.split(",")[1],
+                        mimeType: file.type,
+                    },
+                },
+            }))
+        }
+        reader.readAsDataURL(file)
     };
     return (
         <div className="App">
@@ -58,8 +72,8 @@ const Upload = ({ setImg }) => {
                     style={{ display: "none" }}
                     ref={ikUploadRef}
                 />
-                <label onClick={() => ikUploadRef.current.click()}>
-                    <img src="/attachment.png" className='border-1 h-[15px] w-[15px] cursor-pointer' alt="" />
+                <label onClick={() => ikUploadRef.current.click()} className='cursor-pointer'>
+                    <IoMdImage />
                 </label>
             </IKContext>
         </div>

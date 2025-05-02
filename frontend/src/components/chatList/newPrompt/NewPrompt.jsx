@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Upload from '../../upload/Upload';
-import logo from '../../../assets/react.svg'
 import { IKImage } from "imagekitio-react";
 import { GoogleGenAI } from '@google/genai';
 import { UserMessage, AIMessage } from '../../messageComponents';
+import { IoMdSend } from "react-icons/io";
 
 const NewPrompt = () => {
     const [question, setQuestion] = useState("")
@@ -11,7 +11,8 @@ const NewPrompt = () => {
     const [img, setImg] = useState({
         isLoading: false,
         error: "",
-        dbData: {}
+        dbData: {},
+        aiData: {},
     })
 
     const safetySettings = [
@@ -36,24 +37,40 @@ const NewPrompt = () => {
 
 
     const add = async (text) => {
-        setQuestion(text)
+        setQuestion(text);
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: text,
-            config: {
-                safetySettings: safetySettings,
-            },
-        });
+        const query = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
 
-        setAnswer(response.text)
+        console.log(query);
+
+        try {
+            const response = await ai.models.generateContent({
+                model: "gemini-2.0-flash",
+                contents: query,
+                config: {
+                    safetySettings: safetySettings,
+                },
+            });
+            setImg({
+                isLoading: false,
+                error: "",
+                dbData: {},
+                aiData: {},
+            })
+            setAnswer(response.text)
+
+        } catch (err) {
+            console.log(err.message);
+
+            setAnswer(err.message)
+
+        }
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const text = e.target.text.value;
         if (!text) return;
-
         add(text)
         setAnswer("Wating response...")
     }
@@ -74,10 +91,19 @@ const NewPrompt = () => {
                 onSubmit={handleSubmit}
                 className="w-full position-absolute b-0 bg-[#2c2937] rounded flex items-center gap-[20px] py-0 px-[20px]">
                 <Upload setImg={setImg} />
-                <input type="file" name="file" id="file" multiple={false} hidden />
-                <input type="text" name='text' placeholder="Ask anything" className='flex-1 p-[20px] border-0 outline-none bg-transparent text-[#ececec]' />
+                <input
+                    type="file"
+                    name="file"
+                    id="file"
+                    multiple={false}
+                    hidden />
+                <input
+                    type="text"
+                    name='text'
+                    placeholder="Ask anything"
+                    className='flex-1 p-[20px] border-0 outline-none bg-transparent text-[#ececec]' />
                 <button className='rounded bg-[#605e68] border-0 p-[10px] flex items-center justify-center cursor-pointer'>
-                    <img className='w-[16px] h-[16px] ' src={logo} alt="test" />
+                    <IoMdSend />
                 </button>
             </form>
         </>
