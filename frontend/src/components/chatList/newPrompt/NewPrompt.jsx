@@ -44,24 +44,31 @@ const NewPrompt = () => {
         console.log(query);
 
         try {
-            const response = await ai.models.generateContent({
+            const response = await ai.models.generateContentStream({
                 model: "gemini-2.0-flash",
                 contents: query,
                 config: {
                     safetySettings: safetySettings,
                 },
             });
+
             setImg({
                 isLoading: false,
                 error: "",
                 dbData: {},
                 aiData: {},
-            })
-            setAnswer(response.text)
+            });
+
+            let text = "";
+
+            for await (const chunk of response) {
+                console.log(chunk.text);
+                text += chunk.text;
+                setAnswer(text)
+            }
 
         } catch (err) {
             console.log(err.message);
-
             setAnswer(err.message)
 
         }
