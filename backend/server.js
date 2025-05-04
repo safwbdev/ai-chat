@@ -88,7 +88,7 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
 
 })
 
-app.post("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
+app.get("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
     const { userId } = req.auth;
     try {
         const userChats = await UserChats.find({ userId })
