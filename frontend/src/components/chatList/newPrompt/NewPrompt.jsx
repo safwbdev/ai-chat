@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Upload from '../../upload/Upload';
 import { IKImage } from "imagekitio-react";
 import { GoogleGenAI } from '@google/genai';
-import { UserMessage, AIMessage } from '../../messageComponents';
+import Message from '../../messageComponents';
 import { IoMdSend } from "react-icons/io";
 
 const NewPrompt = () => {
@@ -90,8 +90,8 @@ const NewPrompt = () => {
                     path={img.dbData?.filePath}
                     width={380} />
             )}
-            {question && <UserMessage text={question} />}
-            {answer && <AIMessage text={answer} />}
+            {question && <Message isUser={true} text={question} />}
+            {answer && <Message text={answer} />}
             <div className="pb-[100px]" ref={endRef}></div>
             <form
                 onSubmit={handleSubmit}

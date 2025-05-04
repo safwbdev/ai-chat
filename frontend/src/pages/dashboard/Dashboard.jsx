@@ -1,10 +1,8 @@
 import React from 'react'
 import logo from '../../assets/react.svg'
-import { useAuth } from '@clerk/clerk-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 const Dashboard = () => {
-
-    const { userId } = useAuth()
 
     const Option = ({ image, text }) => (
         <div className="flex flex-1 flex-col gap-[10px] text-300 text-[14px] p-[20px] border-1 rounded">
@@ -12,20 +10,34 @@ const Dashboard = () => {
             <span>{text}</span>
         </div>
     )
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+
+    const mutation = useMutation({
+        mutationFn: (text) => {
+            return fetch(`${import.meta.env.VITE_API_URL}/chats`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ text }),
+            }).then((res) => res.json());
+        },
+        onSuccess: (id) => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ["userChats"] });
+            navigate(`/dashboard/chats/${id}`);
+        },
+    });
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const text = e.target.text.value;
         if (!text) return;
-
-        await fetch("http://localhost:3000/api/chats", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ text })
-        })
+        mutation.mutate(text);
     }
 
     return (
