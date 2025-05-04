@@ -1,7 +1,10 @@
 import React from 'react'
 import logo from '../../assets/react.svg'
+import { useAuth } from '@clerk/clerk-react'
 
 const Dashboard = () => {
+
+    const { userId } = useAuth()
 
     const Option = ({ image, text }) => (
         <div className="flex flex-1 flex-col gap-[10px] text-300 text-[14px] p-[20px] border-1 rounded">
@@ -9,6 +12,20 @@ const Dashboard = () => {
             <span>{text}</span>
         </div>
     )
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const text = e.target.text.value;
+        if (!text) return;
+
+        await fetch("http://localhost:3000/api/chats", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ userId, text })
+        })
+    }
 
     return (
         <div className='flex flex-col items-center w-full h-full'>
@@ -24,8 +41,8 @@ const Dashboard = () => {
                 </div>
             </div>
             <div className="mt-auto">
-                <form className='w-full h-full flex justify-space-between items-center gap-[20px] mb-[10px]'>
-                    <input type="text" placeholder='Ask me anything!' className='flex-1 p-[20px] background-transparent border-0 outline-none text-[#ececec]' />
+                <form onSubmit={handleSubmit} className='w-full h-full flex justify-space-between items-center gap-[20px] mb-[10px]'>
+                    <input type="text" name="text" placeholder='Ask me anything!' className='flex-1 p-[20px] background-transparent border-0 outline-none text-[#ececec]' />
                     <button className='bg-[#605e68] rounded border-0 cursor-pointer p-[10px] flex items-center justify-center mr-[20px]'>
                         <img src={logo} className='w-[16px] h-[16px]' alt="" />
                     </button>

@@ -62,7 +62,6 @@ const NewPrompt = () => {
             let text = "";
 
             for await (const chunk of response) {
-                console.log(chunk.text);
                 text += chunk.text;
                 setAnswer(text)
             }
