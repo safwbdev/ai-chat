@@ -33,7 +33,7 @@ const imagekit = new ImageKit({
     privateKey: process.env.IMAGEKIT_PRIVATE_KEY
 });
 
-app.get("/api/upload", ClerkExpressRequireAuth(), (req, res) => {
+app.get("/api/upload", (req, res) => {
     const result = imagekit.getAuthenticationParameters();
     res.send(result);
 })
@@ -109,6 +109,36 @@ app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
         res.status(500).send("There was an error fetching chat")
     }
 })
+
+app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
+    const { userId } = req.auth;
+
+    const { question, answer, img } = req.body;
+
+    const newItems = [
+        ...(question
+            ? [{ role: "user", parts: [{ text: question }], ...(img && { img }) }]
+            : []),
+        { role: "model", parts: [{ text: answer }] },
+    ];
+
+    try {
+        const updatedChat = await Chat.updateOne(
+            { _id: req.params.id, userId },
+            {
+                $push: {
+                    history: {
+                        $each: newItems,
+                    },
+                },
+            }
+        );
+        res.status(200).send(updatedChat);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error adding conversation!");
+    }
+});
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

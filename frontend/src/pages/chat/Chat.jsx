@@ -2,6 +2,7 @@ import React from 'react'
 import NewPrompt from '../../components/chatList/newPrompt/NewPrompt'
 import Message from '../../components/messageComponents'
 import { useQuery } from '@tanstack/react-query'
+import { IKImage } from "imagekitio-react";
 import { useLocation } from 'react-router-dom'
 
 const Chat = () => {
@@ -26,7 +27,7 @@ const Chat = () => {
                                 <>
                                     {message.img && (
                                         <IKImage
-                                            urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
+                                            urlEndpoint={import.meta.env.VITE_IMAGEKIT_ENDPOINT}
                                             path={message.img}
                                             height="300"
                                             width="400"
@@ -38,7 +39,7 @@ const Chat = () => {
                                     <Message isUser={message.role === "user"} text={message.parts[0].text} />
                                 </>
                             ))}
-                    <NewPrompt />
+                    {data && <NewPrompt data={data} />}
                 </div >
             </div>
         </div>

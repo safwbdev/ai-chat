@@ -4,8 +4,9 @@ import { IKImage } from "imagekitio-react";
 import { GoogleGenAI } from '@google/genai';
 import Message from '../../messageComponents';
 import { IoMdSend } from "react-icons/io";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-const NewPrompt = () => {
+const NewPrompt = ({ data }) => {
     const [question, setQuestion] = useState("")
     const [answer, setAnswer] = useState("")
     const [img, setImg] = useState({
@@ -27,23 +28,57 @@ const NewPrompt = () => {
     ];
 
     const endRef = useRef();
+    const formRef = useRef();
 
     useEffect(() => {
         endRef.current.scrollIntoView({ behavior: "smooth" })
-    }, [question, answer, img]);
+    }, [question, answer, img, data]);
+
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: () => {
+            return fetch(`${import.meta.env.VITE_API_URL}/chats/${data._id}`, {
+                method: "PUT",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    question: question.length ? question : undefined,
+                    answer,
+                    img: img.dbData?.filePath || undefined
+                }),
+            }).then((res) => res.json());
+        },
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(() => {
+                formRef.current.reset();
+                setQuestion("")
+                setAnswer("");
+                setImg({
+                    isLoading: false,
+                    error: "",
+                    dbData: {},
+                    aiData: {},
+                })
+            });
+        },
+        onError: (err) => {
+            console.log(err);
+
+        }
+    });
 
     const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_PUBLIC_KEY });
 
-
-
-    const add = async (text) => {
-        setQuestion(text);
-
-        const query = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
-
-        console.log(query);
+    const add = async (text, isInitial) => {
+        if (!isInitial) setQuestion(text);
 
         try {
+            const query = Object.entries(img.aiData).length ? [img.aiData, text] : [text];
+
             const response = await ai.models.generateContentStream({
                 model: "gemini-2.0-flash",
                 contents: query,
@@ -59,12 +94,14 @@ const NewPrompt = () => {
                 aiData: {},
             });
 
-            let text = "";
+            let accumilatedText = "";
 
             for await (const chunk of response) {
-                text += chunk.text;
-                setAnswer(text)
+                accumilatedText += chunk.text;
+                setAnswer(accumilatedText)
             }
+
+            mutation.mutate()
 
         } catch (err) {
             console.log(err.message);
@@ -77,9 +114,20 @@ const NewPrompt = () => {
         e.preventDefault();
         const text = e.target.text.value;
         if (!text) return;
-        add(text)
-        setAnswer("Wating response...")
+        add(text, false)
+        // setAnswer("Wating response...")
     }
+
+    const hasRun = useRef(false);
+
+    useEffect(() => {
+        if (!hasRun.current) {
+            if (data?.history?.length === 1) {
+                add(data.history[0].parts[0].text, true);
+            }
+        }
+        hasRun.current = true;
+    }, []);
 
     return (
         <>
@@ -95,6 +143,7 @@ const NewPrompt = () => {
             <div className="pb-[100px]" ref={endRef}></div>
             <form
                 onSubmit={handleSubmit}
+                ref={formRef}
                 className="w-full position-absolute b-0 bg-[#2c2937] rounded flex items-center gap-[20px] py-0 px-[20px]">
                 <Upload setImg={setImg} />
                 <input
