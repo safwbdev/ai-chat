@@ -1,14 +1,15 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../../assets/react.svg'
-import { CHAT } from '../../routes'
+import { CHAT, MAIN_URL, SUPERCHATS } from '../../routes'
 import { useQuery } from '@tanstack/react-query'
 
 const ChatList = () => {
+    console.log(MAIN_URL);
 
     const { isPending, data, error } = useQuery({
         queryKey: ['userChats'],
-        queryFn: () => fetch(`${import.meta.env.VITE_API_URL}/userchats`, {
+        queryFn: () => fetch(SUPERCHATS, {
             credentials: "include"
         }).then((res) => res.json()),
     })
